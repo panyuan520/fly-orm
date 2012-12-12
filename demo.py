@@ -17,6 +17,8 @@ class Cow(Model):
     name    =  Field('str', length=30, default = '342342')
     time    =  Field('datetime')
     animal  =  ForeignKey('Animal.id', primary_key = 'id')
+    
+register(Animal, Cow)
 
 mAnimal = Animal(type='333333333333333333333333')
 mAnimal.save()
