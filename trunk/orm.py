@@ -1,16 +1,16 @@
 import os
-from flying import config
-'''
-'database':{
-          'type':'mysql',
-          'user':'root',
-          'passwd':'root',
-          'db':'model',
-          'port':3306,
-          'host':'localhost',
-          'charset':'utf8'
-          }
-'''
+
+config = {
+    'database':{
+              'type':'mysql',
+              'user':'root',
+              'passwd':'root',
+              'db':'model',
+              'port':3306,
+              'host':'localhost',
+              'charset':'utf8'
+              }
+}
 '''
 config = {
             'database':{
@@ -108,6 +108,8 @@ class MysqlBase(object):
         self.cursor = self.connection.cursor()
         
     def save(self):
+        print "self.objectManager", self.objectManager
+        print "self.objectManager", self.objectManager
         sql = "insert into "+self.__tablename__+" ("+",".join(self.objectManager.keys())+") values ("+",".join(["'%s'" % i for i in self.objectManager.values()])+")"  
         self.execute(sql)   
             
@@ -274,10 +276,10 @@ class MongoBase(object):
                     
 class ObjectManager(dict):
 
-    def __getattribute__(self, key):
-        if key in self: 
+    def __getattr__(self, key):
+        if key in self:
             return self[key]
-        else: 
+        else:
             return None
     
     def __setattr__(self, key, value):
