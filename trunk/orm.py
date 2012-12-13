@@ -334,7 +334,10 @@ class Field(object):
     def format(self):
         sql = None
         if self.types == 'int':
-            sql = ' int '
+            if config['database']['type'] == 'sqlite3':
+                sql = ' INTEGER '
+            else:
+                sql = ' int '
         elif self.types == 'str':
             sql = ' char'
         elif self.types == 'datetime':
