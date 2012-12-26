@@ -380,13 +380,13 @@ class Model(object):
         self.base.__tablename__ = self.__tablename__
     
     def all(self):
-        return self._formt_key_object(self.base.all())
+        return self._format_key_object(self.base.all())
         
     def filter(self, *args, **kwargs):
-        return self._formt_key_object(self.base.filter(*args, **kwargs))
+        return self._format_key_object(self.base.filter(*args, **kwargs))
                        
     def get(self, id):
-        return self._formt_key_object(self.base.get(id))
+        return self._format_key_object(self.base.get(id))
         
     def save(self):
         self.base.save() 
@@ -403,7 +403,7 @@ class Model(object):
         sql = "CREATE TABLE if not exists %s (%s)" % (self.__tablename__, sql)
         self.base.execute(sql) 
         
-    def _formt_key_object(self, data):
+    def _format_key_object(self, data):
         if isinstance(data, dict):
             obj = ObjectManager()
             for modu in dir(self):
