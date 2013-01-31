@@ -49,7 +49,7 @@ config_4 = {
                       }
         }
         
-config = config_4
+config = config_3
         
 class ForeignKey(object):
 
