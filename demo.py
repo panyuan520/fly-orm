@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import datetime
 from orm import *
 
 class Animal(Model):
@@ -14,7 +15,7 @@ class Cow(Model):
     __tablename__ = 'cow' 
     
     id      =  Field('int', primary_key = True)
-    name    =  Field('str', length=30, default = '342342')
+    name    =  Field('str', length = 30, default = '342342')
     time    =  Field('datetime')
     animal  =  ForeignKey('Animal.id', primary_key = 'id')
 
@@ -23,17 +24,13 @@ register(Animal, Cow)
 
 mAnimal = Animal()
 mCow = Cow()
-'''
+
 #´´½¨db
 Animal().create()
 Cow().create()
-'''
+
 a = Animal(type = 'p')
 aid = a.save()
-print 'aid', aid
-c = Cow(name = 'yoyoyouyoyoyy', animal = aid)
+c = Cow(name = 'yoyoyouyoyoyy', animal = aid, time = datetime.datetime.now())
 cid = c.save()
-print 'cid', cid
-print "mAnimal", aid, mAnimal.get(aid)
-print 'mCow', cid, mCow.get(cid)
 
