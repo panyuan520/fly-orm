@@ -27,11 +27,11 @@ config_2 = {
 
 config_3 = {
             'database':{
-                      'type':'postgresql',
-                      'user':'postgres',
-                      'passwd':'postgres',
-                      'db':'model',
-                      'port':5433,
+                      'type':'mysql',
+                      'user':'root',
+                      'passwd':'root',
+                      'db':'test',
+                      'port':3306,
                       'host':'localhost',
                       'charset':'utf8'
                       }
@@ -49,7 +49,7 @@ config_4 = {
                       }
         }
         
-config = config_2
+config = config_3
         
 class ForeignKey(object):
 
@@ -108,7 +108,8 @@ class MysqlBase(object):
         
     def save(self):
         sql = "insert into "+self.__tablename__+" ("+",".join(self.objectManager.keys())+") values ("+",".join(["'%s'" % i for i in self.objectManager.values()])+")"  
-        self.execute(sql)   
+        self.execute(sql)
+        return self.cursor.lastrowid
             
     def filter(self, *args, **kwargs):
         query = ''
