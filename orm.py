@@ -267,9 +267,7 @@ class MongoBase(object):
         return self.db[self.__tablename__].find(**kwargs)
         
     def get(self, id):
-        data = self.db[self.__tablename__].find(**{'_id':id})
-        print "data", data
-        return data[0] if data.count > 0 else None
+        return self.db[self.__tablename__].find_one(**{'_id':id})
         
     def all(self):
         return self.db[self.__tablename__].find()
