@@ -21,15 +21,19 @@ class Cow(Model):
 #在orm里注册model    
 register(Animal, Cow)
 
+mAnimal = Animal()
+mCow = Cow()
+'''
 #创建db
 Animal().create()
 Cow().create()
-
-#保存数据
-mAnimal = Animal(type='333333333333333333333333')
-mAnimal.save()
-
-#获取数据
-animals = mAnimal.get(1)
-print animals
+'''
+a = Animal(type = 'p')
+aid = a.save()
+print 'aid', aid
+c = Cow(name = 'yoyoyouyoyoyy', animal = aid)
+cid = c.save()
+print 'cid', cid
+print "mAnimal", aid, mAnimal.get(aid)
+print 'mCow', cid, mCow.get(cid)
 
