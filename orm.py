@@ -264,10 +264,10 @@ class MongoBase(object):
         return self.db[self.__tablename__].insert(self.objectManager) 
             
     def filter(self, *args, **kwargs):
-        return self.db[self.__tablename__].find(**kwargs)
+        return self.db[self.__tablename__].find(kwargs)
         
     def get(self, id):
-        return self.db[self.__tablename__].find_one(**{'_id':id})
+        return self.db[self.__tablename__].find_one({'_id':id})
         
     def all(self):
         return self.db[self.__tablename__].find()
