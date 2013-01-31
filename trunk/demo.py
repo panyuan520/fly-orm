@@ -31,6 +31,7 @@ Cow().create()
 
 a = Animal(type = 'p')
 aid = a.save()
+print "aid", aid
 c = Cow(name = 'yoyoyouyoyoyy', animal = aid, time = datetime.datetime.now())
 cid = c.save()
 
