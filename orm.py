@@ -1,18 +1,18 @@
 import os
 
-config = {
-    'database':{
-              'type':'mysql',
-              'user':'root',
-              'passwd':'root',
-              'db':'model',
-              'port':3306,
-              'host':'localhost',
-              'charset':'utf8'
-              }
-}
-'''
-config = {
+config_1 = {
+            'database':{
+                      'type':'postgresql',
+                      'user':'postgres',
+                      'passwd':'postgres',
+                      'db':'test',
+                      'port':5433,
+                      'host':'localhost',
+                      'charset':'utf8'
+                      }
+        }
+
+config_2 = {
             'database':{
                       'type':'sqlite3',
                       'user':'',
@@ -25,7 +25,7 @@ config = {
         }
 
 
-config = {
+config_3 = {
             'database':{
                       'type':'postgresql',
                       'user':'postgres',
@@ -37,7 +37,7 @@ config = {
                       }
         }
         
-config = {
+config_4 = {
             'database':{
                       'type':'mongodb',
                       'user':'',
@@ -49,7 +49,7 @@ config = {
                       }
         }
         
-'''
+config = config_1
         
 class ForeignKey(object):
 
@@ -108,8 +108,6 @@ class MysqlBase(object):
         self.cursor = self.connection.cursor()
         
     def save(self):
-        print "self.objectManager", self.objectManager
-        print "self.objectManager", self.objectManager
         sql = "insert into "+self.__tablename__+" ("+",".join(self.objectManager.keys())+") values ("+",".join(["'%s'" % i for i in self.objectManager.values()])+")"  
         self.execute(sql)   
             
@@ -215,8 +213,11 @@ class PostgresqlBase(object):
         self.cursor = self.connection.cursor(cursor_factory = psycopg2.extras.RealDictCursor)
         
     def save(self):
-        sql = "insert into "+self.__tablename__+" ("+",".join(self.objectManager.keys())+") values ("+",".join(["'%s'" % i for i in self.objectManager.values()])+")"  
-        self.execute(sql)   
+        sql = "insert into "+self.__tablename__+" ("+",".join(self.objectManager.keys())+") values ("+",".join(["'%s'" % i for i in self.objectManager.values()])+") RETURNING id"  
+        self.execute(sql)
+        one = self.cursor.fetchone()
+        if len(one) > 0:
+            return one.get('id')
             
     def filter(self, *args, **kwargs):
         self.cursor.execute("select * from "+self.__tablename__+" where "+" and".join(['%s=%s' % (key, value) for key, value in kwargs.iteritems()])+"")
@@ -373,8 +374,9 @@ class Model(object):
         self.objectManager = ObjectManager()
         for key, value in kwargs.iteritems():
             if isinstance(getattr(self, key), (Field, ForeignKey)):
-                if getattr(self, key)(value):
-                    self.objectManager[key] = value
+                print "?", getattr(self, key), value
+                #if getattr(self, key)(value):
+                self.objectManager[key] = value
                     
         self.base.objectManager = self.objectManager
         self.base.__tablename__ = self.__tablename__
@@ -389,7 +391,7 @@ class Model(object):
         return self._format_key_object(self.base.get(id))
         
     def save(self):
-        self.base.save() 
+        return self.base.save() 
                 
     def delete(self, *args, **kwargs):
         self.base.delete(*args, **kwargs) 
@@ -400,7 +402,7 @@ class Model(object):
             if isinstance(getattr(self, key), (Field, ForeignKey)):
                 sql.append(key + getattr(self, key).format())
         sql = ",".join(sql)
-        sql = "CREATE TABLE if not exists %s (%s)" % (self.__tablename__, sql)
+        sql = "CREATE TABLE %s (%s)" % (self.__tablename__, sql)
         self.base.execute(sql) 
         
     def _format_key_object(self, data):
