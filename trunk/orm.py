@@ -49,7 +49,7 @@ config_4 = {
                       }
         }
         
-config = config_3
+config = config_4
         
 class ForeignKey(object):
 
@@ -170,7 +170,8 @@ class SqliteBase(object):
     
     def save(self):
         sql = "insert into "+self.__tablename__+" ("+",".join(self.objectManager.keys())+") values ("+",".join(["'%s'" % i for i in self.objectManager.values()])+")"  
-        self.execute(sql)   
+        self.execute(sql)
+        return self.cursor.lastrowid
             
     def filter(self, *args, **kwargs):
         self.cursor.execute("select * from "+self.__tablename__+" where "+" and".join(['%s=%s' % (key, value) for key, value in kwargs.iteritems()])+"")
@@ -260,13 +261,14 @@ class MongoBase(object):
         self.db = self.connection[config['database']['db']]
         
     def save(self):
-        self.db[self.__tablename__].insert(self.objectManager) 
+        return self.db[self.__tablename__].insert(self.objectManager) 
             
     def filter(self, *args, **kwargs):
         return self.db[self.__tablename__].find(**kwargs)
         
     def get(self, id):
         data = self.db[self.__tablename__].find(**{'_id':id})
+        print "data", data
         return data[0] if data.count > 0 else None
         
     def all(self):
@@ -356,8 +358,7 @@ class Field(object):
         
     def __call__(self, value):
         return self.callable(value)
-          
-          
+                 
 class Model(object):
 
     def __init__(self, *args, **kwargs):
