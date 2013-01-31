@@ -49,7 +49,7 @@ config_4 = {
                       }
         }
         
-config = config_1
+config = config_2
         
 class ForeignKey(object):
 
@@ -88,7 +88,6 @@ class Relation(object):
     
     def __call__(self):
         return globals()[self.table]().filter(**{self.column:self.pk})
-    
     
 class MysqlBase(object):
     def __init__(self, *args, **kwargs):
@@ -193,7 +192,7 @@ class SqliteBase(object):
         self.connection.commit()
         
     def primary_key(self, sql):
-        return sql + " auto increment PRIMARY KEY"  
+        return sql + " PRIMARY KEY autoincrement"  
            
 class PostgresqlBase(object):
     def __init__(self, *args, **kwargs):
@@ -290,24 +289,23 @@ class ObjectManager(dict):
     def __delattr__(self, key):
         if key in self: 
             del self[key]
-                
-                
+                            
 class Field(object):
 
     def __init__(self, *args, **kwargs):
     
-        self.types       = args[0]
+        self.head_type   = args[0]
         self.length      = kwargs.get('length')
         self.not_null    = kwargs.get('not_null')
         self.default     = kwargs.get('default')
         self.primary_key = kwargs.get('primary_key')
         self.callable    = None
         
-        if self.types== 'int':
+        if self.head_type== 'int':
             self.callable = self.valid_int
-        elif self.types == 'str':
+        elif self.head_type == 'str':
             self.callable = self.valid_str
-        elif self.types == 'datetime':
+        elif self.head_type == 'datetime':
             self.callable = self.valid_datetime
             
         if config['database']['type'] == 'mysql':
@@ -334,18 +332,18 @@ class Field(object):
     
     def format(self):
         sql = None
-        if self.types == 'int':
+        if self.head_type == 'int':
             if config['database']['type'] == 'sqlite3':
                 sql = ' INTEGER '
             else:
                 sql = ' int '
-        elif self.types == 'str':
+        elif self.head_type == 'str':
             sql = ' char'
-        elif self.types == 'datetime':
+        elif self.head_type == 'datetime':
             sql = ' timestamp'
-        elif self.types == 'text':
+        elif self.head_type == 'text':
             sql = ' text'
-        if self.length and self.types == 'str':
+        if self.length and self.head_type == 'str':
             sql += " ("+str(self.length)+")"
         if self.not_null:
             sql += " NOT NULL"
@@ -370,14 +368,12 @@ class Model(object):
             self.base = PostgresqlBase()
         elif config['database']['type'] == 'mongodb':
             self.base = MongoBase()
-           
+            
         self.objectManager = ObjectManager()
         for key, value in kwargs.iteritems():
             if isinstance(getattr(self, key), (Field, ForeignKey)):
-                print "?", getattr(self, key), value
                 #if getattr(self, key)(value):
                 self.objectManager[key] = value
-                    
         self.base.objectManager = self.objectManager
         self.base.__tablename__ = self.__tablename__
     
